@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hue-Shifting Mouse Trail with Size Control and Pause Feature</title>
+    <title>Hue-Shifting Mouse Trail with Size Control and Space Bar Pause</title>
     <style>
         body {
             margin: 0;
@@ -89,19 +89,21 @@
             baseSize = Math.max(1, Math.min(50, baseSize - delta));
         }
 
-        function handleContextMenu(event) {
-            event.preventDefault();
-            isPaused = !isPaused;
-            if (isPaused) {
-                console.log("Trail paused - image is now static");
-            } else {
-                console.log("Trail resumed");
+        function handleKeyPress(event) {
+            if (event.code === 'Space') {
+                event.preventDefault(); // Prevent scrolling when space is pressed
+                isPaused = !isPaused;
+                if (isPaused) {
+                    console.log("Trail paused - image is now static");
+                } else {
+                    console.log("Trail resumed");
+                }
             }
         }
 
         window.addEventListener('mousemove', createParticles);
         window.addEventListener('wheel', handleWheel);
-        window.addEventListener('contextmenu', handleContextMenu);
+        window.addEventListener('keydown', handleKeyPress);
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
