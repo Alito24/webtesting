@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hue-Shifting Mouse Trail with Size Control</title>
+    <title>Hue-Shifting Mouse Trail with Size Control and Pause Feature</title>
     <style>
         body {
             margin: 0;
@@ -25,22 +25,25 @@
 
         let particles = [];
         let hue = 0;
-        let baseSize = 10; // New variable to control the base size of particles
+        let baseSize = 10;
+        let isPaused = false;
 
         class Particle {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.size = Math.random() * baseSize + baseSize / 2; // Modified to use baseSize
+                this.size = Math.random() * baseSize + baseSize / 2;
                 this.speedX = Math.random() * 3 - 1.5;
                 this.speedY = Math.random() * 3 - 1.5;
                 this.color = `hsl(${hue}, 100%, 50%)`;
             }
 
             update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.size > 0.2) this.size -= 0.1;
+                if (!isPaused) {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.size > 0.2) this.size -= 0.1;
+                }
             }
 
             draw() {
@@ -63,28 +66,42 @@
         }
 
         function createParticles(e) {
-            const mouseX = e.x;
-            const mouseY = e.y;
-            for (let i = 0; i < 5; i++) {
-                particles.push(new Particle(mouseX, mouseY));
+            if (!isPaused) {
+                const mouseX = e.x;
+                const mouseY = e.y;
+                for (let i = 0; i < 5; i++) {
+                    particles.push(new Particle(mouseX, mouseY));
+                }
             }
         }
 
         function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            handleParticles();
-            hue += 2;
+            if (!isPaused) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                handleParticles();
+                hue += 2;
+            }
             requestAnimationFrame(animate);
         }
 
-        // New function to handle mouse wheel events
         function handleWheel(event) {
             const delta = Math.sign(event.deltaY);
-            baseSize = Math.max(1, Math.min(50, baseSize - delta)); // Limit size between 1 and 50
+            baseSize = Math.max(1, Math.min(50, baseSize - delta));
+        }
+
+        function handleContextMenu(event) {
+            event.preventDefault();
+            isPaused = !isPaused;
+            if (isPaused) {
+                console.log("Trail paused - image is now static");
+            } else {
+                console.log("Trail resumed");
+            }
         }
 
         window.addEventListener('mousemove', createParticles);
-        window.addEventListener('wheel', handleWheel); // New event listener for mouse wheel
+        window.addEventListener('wheel', handleWheel);
+        window.addEventListener('contextmenu', handleContextMenu);
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
