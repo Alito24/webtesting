@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hue-Shifting Mouse Trail</title>
+    <title>Hue-Shifting Mouse Trail with Size Control</title>
     <style>
         body {
             margin: 0;
@@ -25,12 +25,13 @@
 
         let particles = [];
         let hue = 0;
+        let baseSize = 10; // New variable to control the base size of particles
 
         class Particle {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.size = Math.random() * 15 + 5;
+                this.size = Math.random() * baseSize + baseSize / 2; // Modified to use baseSize
                 this.speedX = Math.random() * 3 - 1.5;
                 this.speedY = Math.random() * 3 - 1.5;
                 this.color = `hsl(${hue}, 100%, 50%)`;
@@ -76,7 +77,14 @@
             requestAnimationFrame(animate);
         }
 
+        // New function to handle mouse wheel events
+        function handleWheel(event) {
+            const delta = Math.sign(event.deltaY);
+            baseSize = Math.max(1, Math.min(50, baseSize - delta)); // Limit size between 1 and 50
+        }
+
         window.addEventListener('mousemove', createParticles);
+        window.addEventListener('wheel', handleWheel); // New event listener for mouse wheel
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
